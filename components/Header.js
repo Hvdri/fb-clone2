@@ -15,9 +15,10 @@ import {
 import { signOut } from 'next-auth/react';
 import { useSession } from 'next-auth/react';
 
+
 function Header() {
   
-  const { data: session } = useSession()
+  const { data: session, loading } = useSession();
   
   return (
     <div className='sticky top-0 z-50 bg-white flex items-center p-2 lg:pg-5 shadow-md'>
@@ -73,7 +74,7 @@ function Header() {
             />
 
 
-            <p className='whitespace-nowrap font-semibold pr-3'>USERNAME</p>
+            <p className='whitespace-nowrap font-semibold pr-3'>{session.user.name}</p>
             <ViewGridIcon className="icon" />
             <ChatIcon className="icon" />
             <BellIcon className="icon" />
