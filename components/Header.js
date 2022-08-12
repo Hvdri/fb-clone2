@@ -12,7 +12,13 @@ import {
   SearchIcon, FlagIcon, PlayIcon, ShoppingCartIcon,
 } from '@heroicons/react/outline';
 
+import { signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
+
 function Header() {
+  
+  const { data: session } = useSession()
+  
   return (
     <div className='sticky top-0 z-50 bg-white flex items-center p-2 lg:pg-5 shadow-md'>
         {/* LEFT */}
@@ -55,6 +61,17 @@ function Header() {
 
           {/* RIGHT */}
           <div className='flex items-center sm:space-x-2 justify-end '>
+
+            {/* SIGN OUT */}
+            <Image 
+                onClick={() => signOut()}
+                className='rounded-full cursor-pointer'
+                src = {session.user.image}
+                width={40}
+                height={40}
+                layout="fixed"
+            />
+
 
             <p className='whitespace-nowrap font-semibold pr-3'>USERNAME</p>
             <ViewGridIcon className="icon" />
