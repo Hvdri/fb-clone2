@@ -2,6 +2,7 @@ module.exports = {
   images: {
     domains: [
       "platform-lookaside.fbsbx.com",
+      "images.unsplash.com",
       "firebasestorage.googleapis.com",
     ],
   },
