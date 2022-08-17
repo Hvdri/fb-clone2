@@ -21,7 +21,7 @@ function Header() {
   const { data: session, loading } = useSession();
   
   return (
-    <div className='sticky top-0 z-50 bg-white flex items-center p-2 lg:pg-5 shadow-md'>
+    <div className='pl-4 sticky top-0 z-50 bg-white flex items-center p-1 lg:pg-5 shadow-md'>
         {/* LEFT */}
 
         <div className='flex items-center'>
@@ -61,24 +61,22 @@ function Header() {
           </div>
 
           {/* RIGHT */}
-          <div className='flex items-center sm:space-x-2 justify-end '>
+          <div className='flex items-center sm:space-x-2 justify-end'>
 
             {/* SIGN OUT */}
-            <Image 
-                onClick={() => signOut()}
-                className='rounded-full cursor-pointer'
-                src = {session.user.image}
-                width={40}
-                height={40}
-                layout="fixed"
-            />
 
 
-            <p className='whitespace-nowrap font-semibold pr-3'>{session.user.name}</p>
+            {/* <p className='whitespace-nowrap font-semibold pr-3'>{session.usser.name}</p> */}
             <ViewGridIcon className="icon" />
             <ChatIcon className="icon" />
             <BellIcon className="icon" />
-            <ChevronDownIcon className="icon" />
+            {/* <ChevronDownIcon className="icon" /> */}
+
+            <img 
+                onClick={() => signOut()}
+                className= "icon p-0"
+                src = {session.user.image}
+            />
 
           </div>
 
