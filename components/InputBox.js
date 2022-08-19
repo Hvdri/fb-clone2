@@ -3,10 +3,20 @@ import React from 'react'
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
 
+import { EmojiHappyIcon } from '@heroicons/react/solid';
+import { CameraIcon, VideoCameraIcon } from '@heroicons/react/solid';
+
+
 
 function InputBox() {
-  
-  const { data: session, loading } = useSession();
+    
+    const { data: session, loading } = useSession();
+    
+    const sendPost = (e) => {
+
+        e.preventDefault();
+        
+    }
   return (
 
 
@@ -28,7 +38,7 @@ function InputBox() {
             <form className='flex flex-1'>
                 <input 
                     className='rounded-full h-auto bg-gray-100
-                            flex-grow px-5 focus:utline-none' 
+                            flex-grow px-5 focus:outline-none' 
                     type="text" 
                     placeholder={`What's on your mind, ${session.user.name}?`} />
             
@@ -45,8 +55,23 @@ function InputBox() {
 
         </div>
 
-        <div>
-            {/* LIVE + VIDEO/PIC + STATUS */}
+        <div className='pl-11 flex space-x-4 p-2 items-centers'>
+            
+            <div className='flex flex-1'>
+                <VideoCameraIcon className='h-7 rounded-full text-red-600'/>
+                <p className='px-1 flex-grow '>Live Video</p>
+            </div>
+            
+            <div className='flex flex-1'>
+                <CameraIcon className='h-7 rounded-full text-green-700'/>
+                <p className='px-1 flex-grow '>Photo/Video</p>
+            </div>
+            
+            <div className='flex flex-1'>
+                <EmojiHappyIcon className='h-7 rounded-full text-yellow-600'/>
+                <p className='px-1 flex-grow '>Feeling/Acivity</p>
+            </div>
+
         </div>
 
 
