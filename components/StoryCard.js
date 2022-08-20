@@ -6,7 +6,7 @@ function StoryCard( { name, src, profile } ) {
   return (
     
     <div className='relative h-12 w-12 sm-h-12
-                    lg-h-56 lg:w-32 md:h-60 cursor-pointer overflow-x p-3
+                    lg-h-56 lg:w-32 md:h-60 cursor-pointer overflow-hidden p-3
                     transition duration-200 transform ease-in
                     hover:scale-105 hover:animate-pulse'>
         <Image 

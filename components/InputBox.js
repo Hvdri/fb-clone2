@@ -43,7 +43,7 @@ function InputBox() {
                     placeholder={`What's on your mind, ${session.user.name}?`} />
             
                 <button 
-                    // hidden
+                    hidden
                     type="submit"
                     onClick={() => sendPost()}
                     className='rounded-full'>
@@ -55,23 +55,23 @@ function InputBox() {
 
         </div>
 
-        <div className='pl-11 flex space-x-4 p-2 items-centers'>
+        <div className='flex space-x-4 p-2 items-centers border-t'>
             
-            <div className='flex flex-1'>
-                <VideoCameraIcon className='h-7 rounded-full text-red-600'/>
-                <p className='px-1 flex-grow '>Live Video</p>
+            <div className='inputIcon'>
+                <VideoCameraIcon className='sm:h-6 h-7 rounded-full text-red-600'/>
+                <p className='sm:text-sm xl:text-base'>Live Video</p>
             </div>
             
-            <div className='flex flex-1'>
-                <CameraIcon className='h-7 rounded-full text-green-700'/>
-                <p className='px-1 flex-grow '>Photo/Video</p>
+            <div className='inputIcon'>
+                <CameraIcon className='sm:h-6 h-7 rounded-full text-green-700'/>
+                <p className='sm:text-sm xl:text-base'>Photo/Video</p>
             </div>
             
-            <div className='flex flex-1'>
-                <EmojiHappyIcon className='h-7 rounded-full text-yellow-600'/>
-                <p className='px-1 flex-grow '>Feeling/Acivity</p>
+            <div className='inputIcon'>
+                <EmojiHappyIcon className='sm:h-6 h-7 rounded-full text-yellow-600'/>
+                <p className='sm:text-sm xl:text-base'>Feeling/Acivity</p>
             </div>
-
+            
         </div>
 
 
