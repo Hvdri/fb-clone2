@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
@@ -6,17 +6,34 @@ import { useSession } from 'next-auth/react'
 import { EmojiHappyIcon } from '@heroicons/react/solid';
 import { CameraIcon, VideoCameraIcon } from '@heroicons/react/solid';
 
+import {db} from '../firebase';
 
 
 function InputBox() {
     
     const { data: session, loading } = useSession();
     
-    const sendPost = (e) => {
+    const inputRef = useRef(null);
 
+    const sendPost = (e) => {
         e.preventDefault();
         
-    }
+        if(!inputRef.current.value) return;
+        
+        db.collection('posts').add({
+            message: inputRef.current.value,
+            name: session.user.name,
+            email: session.user.email,
+            image: session.user.image,
+            // get server timestamp
+            // timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+        
+        })
+
+        inputRef.current.value = '';
+
+    };
+
   return (
 
 
@@ -37,6 +54,7 @@ function InputBox() {
 
             <form className='flex flex-1'>
                 <input 
+                    ref={inputRef}
                     className='rounded-full h-auto bg-gray-100
                             flex-grow px-5 focus:outline-none' 
                     type="text" 
@@ -45,7 +63,8 @@ function InputBox() {
                 <button 
                     hidden
                     type="submit"
-                    onClick={() => sendPost()}
+                    // onClick={() => sendPost()}
+                    onClick={sendPost}
                     className='rounded-full'>
                     Submit            
                 </button>
