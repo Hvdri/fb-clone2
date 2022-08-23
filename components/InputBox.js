@@ -49,34 +49,13 @@ function InputBox() {
               name: session.user.name,
               email: session.user.email,
               image: session.user.image,
-              //add a timestamp to the document
               timestamp: new Date().getTime(),
               currentDateTime: Date().toLocaleString(),
-              //add the current time day/month/year to the document
 
-            }).then( doc => {
-                if(ImageToPost){
-                    const uploadTask = storage.ref(`posts/${doc.id}`)
-                                        .putString(ImageToPost,'data_url');
-                    removeImage();
+            })
 
-                    uploadTask.on(
-                        'state_change', 
-                        null, 
-                        (error) => console.error(error),
-                    () => {
-                        // Upload Completed successfully
-                        storage.ref('posts').child(doc.id).getDownloadURL().then(url => {
-                            db.collection('posts').doc(doc.id).set({
-                                postImage: url,
-                            },
-                                { merge: true } 
-                            )
-                        })
-                    }
-                );
-            }
-            });
+            // const image = ref(storage, `${ImageToPost}`)
+
           }
         addNewDocument();
         console.log('here!');

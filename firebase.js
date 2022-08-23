@@ -33,3 +33,31 @@ const insertFeed = doc(db, 'feed/feed');
 const newCollection = collection(db, 'posts');
 
 export { db, insertFeed, app, newCollection, storage }; 
+
+//cod copiat de pe internet de care s ar putea sa am nevoie:
+
+/* 
+.then( doc => {
+                if(ImageToPost){
+                    const uploadTask = storage.ref(`posts/${doc.id}`)
+                                        .putString(ImageToPost,'data_url');
+                    removeImage();
+
+                    uploadTask.on(
+                        'state_change', 
+                        null, 
+                        (error) => console.error(error),
+                    () => {
+                        // Upload Completed successfully
+                        storage.ref('posts').child(doc.id).getDownloadURL().then(url => {
+                            db.collection('posts').doc(doc.id).set({
+                                postImage: url,
+                            },
+                                { merge: true } 
+                            )
+                        })
+                    }
+                );
+            }
+            });
+*/
