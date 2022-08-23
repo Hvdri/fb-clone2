@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState } from 'react'
 
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
@@ -6,7 +6,26 @@ import { useSession } from 'next-auth/react'
 import { EmojiHappyIcon } from '@heroicons/react/solid';
 import { CameraIcon, VideoCameraIcon } from '@heroicons/react/solid';
 
-import {db} from '../firebase';
+
+// IMPORTS FOR FIREBASE
+import { db, insertFeed, newCollection, storage } from '../firebase';
+import { getFirestore, doc, setDoc, addDoc } from "firebase/firestore";
+
+
+function prenume( str ) {
+    return str.split(" ")[0];
+}  
+
+// function addToCollectionDocument(inputRef){
+//     const docData = {
+//         message: {inputRef}.current.value,
+//         name: session.user.name,
+//         email: session.user.email,
+//         image: session.user.image,
+//     };
+
+//     setDoc(insertFeed, docData);
+// }
 
 
 function InputBox() {
@@ -14,24 +33,69 @@ function InputBox() {
     const { data: session, loading } = useSession();
     
     const inputRef = useRef(null);
+    const filepickerRef = useRef(null);
+    const [ImageToPost, setImageToPost] = useState(null);
 
+    //send post function to the db via firestore
     const sendPost = (e) => {
         e.preventDefault();
         
         if(!inputRef.current.value) return;
-        
-        db.collection('posts').add({
-            message: inputRef.current.value,
-            name: session.user.name,
-            email: session.user.email,
-            image: session.user.image,
-            // get server timestamp
-            // timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        
-        })
 
+
+        async function addNewDocument() {
+            const newDoc = await addDoc(newCollection, {
+              message: inputRef.current.value,
+              name: session.user.name,
+              email: session.user.email,
+              image: session.user.image,
+              //add a timestamp to the document
+              timestamp: new Date().getTime(),
+              currentDateTime: Date().toLocaleString(),
+              //add the current time day/month/year to the document
+
+            }).then( doc => {
+                if(ImageToPost){
+                    const uploadTask = storage.ref(`posts/${doc.id}`)
+                                        .putString(ImageToPost,'data_url');
+                    removeImage();
+
+                    uploadTask.on(
+                        'state_change', 
+                        null, 
+                        (error) => console.error(error),
+                    () => {
+                        // Upload Completed successfully
+                        storage.ref('posts').child(doc.id).getDownloadURL().then(url => {
+                            db.collection('posts').doc(doc.id).set({
+                                postImage: url,
+                            },
+                                { merge: true } 
+                            )
+                        })
+                    }
+                );
+            }
+            });
+          }
+        addNewDocument();
+        console.log('here!');
         inputRef.current.value = '';
+    };
 
+    const addImageToPost = (e) => {
+        const reader = new FileReader();
+        if(e.target.files[0]){
+            reader.readAsDataURL(e.target.files[0]);
+        };
+
+        reader.onload = (readerEvent) => {
+            setImageToPost(readerEvent.target.result);
+        };
+    };
+
+    const removeImage = () => {
+        setImageToPost(null);
     };
 
   return (
@@ -58,18 +122,32 @@ function InputBox() {
                     className='rounded-full h-auto bg-gray-100
                             flex-grow px-5 focus:outline-none' 
                     type="text" 
-                    placeholder={`What's on your mind, ${session.user.name}?`} />
+                    placeholder={`What's on your mind, ${prenume(session.user.name)}?`} />
             
                 <button 
                     hidden
                     type="submit"
-                    // onClick={() => sendPost()}
                     onClick={sendPost}
                     className='rounded-full'>
                     Submit            
                 </button>
                 
-                
+                {ImageToPost && (
+                    <div 
+                    onClick={removeImage} 
+                    className='flex flex-col filter hover:brightness-110
+                               transition duration-150 transform hover:scale-105
+                               cursor-pointer h-12'>
+                        <img 
+                        src={ImageToPost} alt="" 
+                        className='h-12 object-contain rounded-md'
+                        />
+                        {/* A black drop appears shh idk why doesn't matter */}
+                        {/* <p className='text-h-0 p-0 text-red-500 text-center'>Remove</p>' */}
+                    
+                    </div>
+                )}
+
             </form>
 
         </div>
@@ -81,9 +159,17 @@ function InputBox() {
                 <p className='sm:text-sm xl:text-base'>Live Video</p>
             </div>
             
-            <div className='inputIcon'>
+            <div
+            onClick={ () => filepickerRef.current.click() } 
+            className='inputIcon'>
                 <CameraIcon className='sm:h-6 h-7 rounded-full text-green-700'/>
                 <p className='sm:text-sm xl:text-base'>Photo/Video</p>
+                <input 
+                    hidden
+                    type='file'
+                    onChange={addImageToPost}
+                    ref={filepickerRef}
+                />
             </div>
             
             <div className='inputIcon'>

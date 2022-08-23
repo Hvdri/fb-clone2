@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 // import { getAnalytics } from "firebase/analytics";
 
-import { getFirestore, doc } from "firebase/firestore";
+import { getFirestore, doc, setDoc, collection, Firestore, addDoc } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -22,8 +22,14 @@ const app = initializeApp(firebaseConfig);
 // Initialize Services 
 
 const db = getFirestore(app);
-// const storage = getStorage(app);
+const storage = getStorage(app);
 // const analytics = getAnalytics(app)
 // export { db, storage };
 
-const test = doc(db, 'feed/feed');
+//           colectie / document
+const insertFeed = doc(db, 'feed/feed');
+
+//new Collection:
+const newCollection = collection(db, 'posts');
+
+export { db, insertFeed, app, newCollection, storage }; 
