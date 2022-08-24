@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 
 import Image from 'next/image'
 import { useSession } from 'next-auth/react'
@@ -10,7 +10,10 @@ import { CameraIcon, VideoCameraIcon } from '@heroicons/react/solid';
 // IMPORTS FOR FIREBASE
 import { db, insertFeed, newCollection, storage } from '../firebase';
 import { getFirestore, doc, setDoc, addDoc } from "firebase/firestore";
+import { ref, uploadBytes, listAll, getDownloadURL } from 'firebase/storage';
 
+// Randomizer for the name of the images
+import { v4 } from 'uuid';
 
 function prenume( str ) {
     return str.split(" ")[0];
@@ -27,21 +30,21 @@ function prenume( str ) {
 //     setDoc(insertFeed, docData);
 // }
 
-
 function InputBox() {
     
     const { data: session, loading } = useSession();
     
     const inputRef = useRef(null);
     const filepickerRef = useRef(null);
+
     const [ImageToPost, setImageToPost] = useState(null);
+    const [ImageList, setImageList] = useState([]);
 
     //send post function to the db via firestore
     const sendPost = (e) => {
         e.preventDefault();
         
         if(!inputRef.current.value) return;
-
 
         async function addNewDocument() {
             const newDoc = await addDoc(newCollection, {
@@ -52,36 +55,64 @@ function InputBox() {
               timestamp: new Date().getTime(),
               currentDateTime: Date().toLocaleString(),
 
+            }).then(() => {
+                // Check if there is an image selected
+                if(ImageToPost == null) return;
+                // Create a reference
+                const imageRef = ref(storage, `images/${ImageToPost.name + v4()}`);
+                // Upload the image to the storage
+                uploadBytes(imageRef, ImageToPost).then(() => {
+                    alert(`Image uploaded successfully`);
+                })
+                removeImage();
             })
-
-            // const image = ref(storage, `${ImageToPost}`)
-
-          }
+        };
+                
         addNewDocument();
         console.log('here!');
         inputRef.current.value = '';
     };
 
     const addImageToPost = (e) => {
+        
         const reader = new FileReader();
-        if(e.target.files[0]){
-            reader.readAsDataURL(e.target.files[0]);
-        };
+        const file = e.target.files[0];
 
+        if(file){
+            reader.readAsDataURL(file);
+        };
+            
+        // Preview Of The Image On The Screen
         reader.onload = (readerEvent) => {
             setImageToPost(readerEvent.target.result);
-        };
+        };        
+        
+        setImageToPost(e.target.files[0]);
     };
 
     const removeImage = () => {
         setImageToPost(null);
     };
 
+
+
+    const imageListRef = ref(storage, 'images/');
+    useEffect(() => {
+        listAll(imageListRef).then((response) => {
+            response.items.forEach((item) => {
+                getDownloadURL(item).then((downloadURL) => {
+                    setImageList((prev) => [...prev, downloadURL]);
+                });
+            })
+        });
+    }, []);
+    
+
   return (
-
-
-
-    <div className='bg-white p-2 rounded-2xl 
+      
+      
+      
+      <div className='bg-white p-2 rounded-2xl 
                     shadow-md text-gray-500
                     font-medium mt-6'>
         
@@ -99,7 +130,7 @@ function InputBox() {
                 <input 
                     ref={inputRef}
                     className='rounded-full h-auto bg-gray-100
-                            flex-grow px-5 focus:outline-none' 
+                    flex-grow px-5 focus:outline-none' 
                     type="text" 
                     placeholder={`What's on your mind, ${prenume(session.user.name)}?`} />
             
@@ -158,7 +189,10 @@ function InputBox() {
             
         </div>
 
-
+        {/* Test Imagini */}
+        {ImageList.map((downloadURL) => {
+            return <img src={downloadURL} alt='poza care nu merge' />
+        })}
         
     </div>
   )
