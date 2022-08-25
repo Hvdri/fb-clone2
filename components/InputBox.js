@@ -9,7 +9,7 @@ import { CameraIcon, VideoCameraIcon } from '@heroicons/react/solid';
 
 // IMPORTS FOR FIREBASE
 import { db, insertFeed, newCollection, storage } from '../firebase';
-import { getFirestore, doc, setDoc, addDoc } from "firebase/firestore";
+import { getFirestore, doc, setDoc, addDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, listAll, getDownloadURL } from 'firebase/storage';
 
 // Randomizer for the name of the images
@@ -30,6 +30,8 @@ function prenume( str ) {
 //     setDoc(insertFeed, docData);
 // }
 
+const imageMimeType = /image\/(png|jpg|jpeg)/i;
+
 function InputBox() {
     
     const { data: session, loading } = useSession();
@@ -38,6 +40,7 @@ function InputBox() {
     const filepickerRef = useRef(null);
 
     const [ImageToPost, setImageToPost] = useState(null);
+    const [fileDataURL, setFileDataURL] = useState(null);
     const [ImageList, setImageList] = useState([]);
 
     //send post function to the db via firestore
@@ -54,16 +57,26 @@ function InputBox() {
               image: session.user.image,
               timestamp: new Date().getTime(),
               currentDateTime: Date().toLocaleString(),
+              postImage: '',
 
             }).then(() => {
+                
                 // Check if there is an image selected
                 if(ImageToPost == null) return;
                 // Create a reference
-                const imageRef = ref(storage, `images/${ImageToPost.name + v4()}`);
+                const nameOfTheImage = ImageToPost.name + v4();
+                const imageRef = ref(storage, `images/${nameOfTheImage}`);
+
+
+                // const x = doc(db, "posts", imageRef);
+                // updateDoc(x, {
+                //     postImage: imageRef,
+                // })
+                
                 // Upload the image to the storage
-                uploadBytes(imageRef, ImageToPost).then(() => {
+                uploadBytes(imageRef, ImageToPost).then(() => {                    
                     alert(`Image uploaded successfully`);
-                })
+                }, { merge: true })
                 removeImage();
             })
         };
@@ -73,31 +86,65 @@ function InputBox() {
         inputRef.current.value = '';
     };
 
-    const addImageToPost = (e) => {
-        
-        const reader = new FileReader();
-        const file = e.target.files[0];
+    // const addImageToPost = (e) => {
 
-        if(file){
-            reader.readAsDataURL(file);
-        };
+    //     const reader = new FileReader();
+    //     const file = e.target.files[0];
+
+    //     if(file){
+    //         reader.readAsDataURL(file);
+    //     };
             
-        // Preview Of The Image On The Screen
-        reader.onload = (readerEvent) => {
-            setImageToPost(readerEvent.target.result);
-        };        
+    //     // Preview Of The Image On The Screen
+    //     reader.onload = (readerEvent) => {
+    //         setImageToPost(readerEvent.target.result);
+    //     };        
         
-        setImageToPost(e.target.files[0]);
-    };
+    //     setImageToPost(e.target.files[0]);
+    // };
 
     const removeImage = () => {
-        setImageToPost(null);
+        setFileDataURL(null);
     };
 
 
 
+    
+    ////////////////////////////////////////////////////////////////
+    const changeHandler = (e) => {
+        const file = e.target.files[0];
+        if (!file.type.match(imageMimeType)) {
+          alert("Image mime type is not valid");
+          return;
+        }
+        setImageToPost(file);
+    }
+    
+    useEffect(() => {
+        let fileReader, isCancel = false;
+        if (ImageToPost) {
+            fileReader = new FileReader();
+            fileReader.onload = (e) => {
+            const { result } = e.target;
+            if (result && !isCancel) {
+              setFileDataURL(result)
+            }
+        }
+          fileReader.readAsDataURL(ImageToPost);
+        }
+        return () => {
+            isCancel = true;
+            if (fileReader && fileReader.readyState === 1) {
+                fileReader.abort();
+            }  
+        }
+        
+    }, [ImageToPost]);
+    
+    ////////////////////////////////////////////////////////////////
     const imageListRef = ref(storage, 'images/');
     useEffect(() => {
+        
         listAll(imageListRef).then((response) => {
             response.items.forEach((item) => {
                 getDownloadURL(item).then((downloadURL) => {
@@ -107,7 +154,7 @@ function InputBox() {
         });
     }, []);
     
-
+    
   return (
       
       
@@ -142,15 +189,15 @@ function InputBox() {
                     Submit            
                 </button>
                 
-                {ImageToPost && (
+                {fileDataURL && (
                     <div 
                     onClick={removeImage} 
                     className='flex flex-col filter hover:brightness-110
                                transition duration-150 transform hover:scale-105
                                cursor-pointer h-12'>
                         <img 
-                        src={ImageToPost} alt="" 
-                        className='h-12 object-contain rounded-md'
+                        src={fileDataURL} alt="" 
+                        className='h-12 bject-contain rounded-md'
                         />
                         {/* A black drop appears shh idk why doesn't matter */}
                         {/* <p className='text-h-0 p-0 text-red-500 text-center'>Remove</p>' */}
@@ -177,7 +224,9 @@ function InputBox() {
                 <input 
                     hidden
                     type='file'
-                    onChange={addImageToPost}
+                    id='image'
+                    // accept="image/*"
+                    onChange={changeHandler}
                     ref={filepickerRef}
                 />
             </div>
