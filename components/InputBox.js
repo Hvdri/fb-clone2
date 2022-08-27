@@ -59,19 +59,23 @@ function InputBox() {
               currentDateTime: Date().toLocaleString(),
               postImage: '',
 
-            }).then(() => {
+            }).then((newDoc) => {
                 
                 // Check if there is an image selected
                 if(ImageToPost == null) return;
+                
                 // Create a reference
                 const nameOfTheImage = ImageToPost.name + v4();
                 const imageRef = ref(storage, `images/${nameOfTheImage}`);
 
+                // const uploadTask = ref(storage, `posts/${doc.id}`)
+                //                         .toString(ImageToPost,'data_url');
 
-                // const x = doc(db, "posts", imageRef);
-                // updateDoc(x, {
-                //     postImage: imageRef,
-                // })
+                const uploadTaskRef = doc(db, 'posts', `${newDoc.id}`)
+
+                setDoc(uploadTaskRef, {
+                    postImage: nameOfTheImage,
+                }, { merge: true })
                 
                 // Upload the image to the storage
                 uploadBytes(imageRef, ImageToPost).then(() => {                    

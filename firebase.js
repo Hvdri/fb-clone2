@@ -44,18 +44,18 @@ export { db, insertFeed, app, newCollection, storage };
                     removeImage();
 
                     uploadTask.on(
-                        'state_change', 
-                        null, 
-                        (error) => console.error(error),
-                    () => {
-                        // Upload Completed successfully
-                        storage.ref('posts').child(doc.id).getDownloadURL().then(url => {
-                            db.collection('posts').doc(doc.id).set({
-                                postImage: url,
-                            },
-                                { merge: true } 
-                            )
-                        })
+                    'state_change', 
+                    null, 
+                    (error) => console.error(error),
+                () => {
+                    // Upload Completed successfully
+                    storage.ref('posts').child(doc.id).getDownloadURL().then(url => {
+                        db.collection('posts').doc(doc.id).set({
+                            postImage: url,
+                        }, { merge: true }) 
+                        
+                    })
+                })
                     }
                 );
             }
