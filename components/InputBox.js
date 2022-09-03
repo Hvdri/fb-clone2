@@ -68,19 +68,26 @@ function InputBox() {
                 const nameOfTheImage = ImageToPost.name + v4();
                 const imageRef = ref(storage, `images/${nameOfTheImage}`);
 
-                // const uploadTask = ref(storage, `posts/${doc.id}`)
-                //                         .toString(ImageToPost,'data_url');
-
                 const uploadTaskRef = doc(db, 'posts', `${newDoc.id}`)
-
-                setDoc(uploadTaskRef, {
-                    postImage: nameOfTheImage,
-                }, { merge: true })
                 
                 // Upload the image to the storage
                 uploadBytes(imageRef, ImageToPost).then(() => {                    
+                    getDownloadURL(imageRef).then((url) => {
+                        
+                        setDoc(uploadTaskRef, {
+                            postImage: url,
+                        }, { merge: true })
+
+                    }).catch((error) => {
+                        alert(error.message);
+                    });
                     alert(`Image uploaded successfully`);
                 }, { merge: true })
+                
+
+                // Get the downloadable url for the image
+
+                // Remove the image preview
                 removeImage();
             })
         };
@@ -90,31 +97,11 @@ function InputBox() {
         inputRef.current.value = '';
     };
 
-    // const addImageToPost = (e) => {
-
-    //     const reader = new FileReader();
-    //     const file = e.target.files[0];
-
-    //     if(file){
-    //         reader.readAsDataURL(file);
-    //     };
-            
-    //     // Preview Of The Image On The Screen
-    //     reader.onload = (readerEvent) => {
-    //         setImageToPost(readerEvent.target.result);
-    //     };        
-        
-    //     setImageToPost(e.target.files[0]);
-    // };
-
     const removeImage = () => {
         setFileDataURL(null);
     };
-
-
-
     
-    ////////////////////////////////////////////////////////////////
+    // Updates the current image
     const changeHandler = (e) => {
         const file = e.target.files[0];
         if (!file.type.match(imageMimeType)) {
@@ -124,6 +111,7 @@ function InputBox() {
         setImageToPost(file);
     }
     
+    // Preview of the image
     useEffect(() => {
         let fileReader, isCancel = false;
         if (ImageToPost) {
@@ -145,23 +133,7 @@ function InputBox() {
         
     }, [ImageToPost]);
     
-    ////////////////////////////////////////////////////////////////
-    const imageListRef = ref(storage, 'images/');
-    useEffect(() => {
-        
-        listAll(imageListRef).then((response) => {
-            response.items.forEach((item) => {
-                getDownloadURL(item).then((downloadURL) => {
-                    setImageList((prev) => [...prev, downloadURL]);
-                });
-            })
-        });
-    }, []);
-    
-    
   return (
-      
-      
       
       <div className='bg-white p-2 rounded-2xl 
                     shadow-md text-gray-500

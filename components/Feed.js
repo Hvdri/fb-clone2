@@ -2,6 +2,7 @@ import React from 'react'
 
 import Stories from '../components/Stories'
 import InputBox from '../components/InputBox'
+import Posts from '../components/Posts'
 
 function Feed() {
   return (
@@ -11,7 +12,7 @@ function Feed() {
                     lg:max-w-2xl'>
             <Stories />
             <InputBox />
-            {/* Posts */}
+            <Posts />
         </div>
 
     </div>
