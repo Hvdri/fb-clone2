@@ -9,7 +9,9 @@ import { query, orderBy, collection } from 'firebase/firestore';
 function Posts() {
 
     const [realtimePosts, loading, error] = useCollection(
-            collection(db, 'posts'), orderBy("timestamp", "desc")
+      query(
+        collection(db, 'posts'), orderBy('timestamp', 'desc')
+      )
     );
 
   return (
