@@ -215,9 +215,10 @@ function InputBox() {
         </div>
 
         {/* Test Imagini */}
-        {ImageList.map((downloadURL) => {
+        {/* {ImageList.map((downloadURL) => {
+            key = downloadURL;
             return <img src={downloadURL} alt='poza care nu merge' />
-        })}
+        })} */}
         
     </div>
   )
