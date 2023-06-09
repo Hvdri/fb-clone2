@@ -35,7 +35,7 @@ function Header() {
 
           
 
-            <div className='flex nl-2 items-center rounded-full bg-gray-100 p-2'>
+            <div className='flex nl-2 items-center rounded-full bg-gray-100'>
               <SearchIcon className='h-6 text-gray-600'/>
               <input className='hidden md:inline-flex nl-2 items-center bg-transparent 
               outline-none placeholder-gray-500 flex-shrink' 
